@@ -1,4 +1,5 @@
-# This application is basic implementation of my idea to synchronize all devices and their workspaces. This will be improved in the future.
+# tSync - best workflow experience on multiple devices
+This application is basic implementation of my idea to synchronize all devices and their workspaces. This will be improved in the future.
 
 # Working
 - connection with many devices

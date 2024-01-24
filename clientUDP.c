@@ -10,21 +10,22 @@
 
 char*
 stringify(
-		int mleft,
-		int mmiddle,
-		int mright,
-		int mbytes,
-		signed char mx,
-		signed char my,
-		unsigned char *mdata)
+	int mleft,
+	int mmiddle,
+	int mright,
+	int mbytes,
+	signed char mx,
+	signed char my,
+	unsigned char *mdata
+)
 {
 	if(mbytes > 0)
-   {			
+	{			
 		mleft = mdata[0] & 0x1;
-      mright = mdata[0] & 0x2;
-      mmiddle = mdata[0] & 0x4;
-      mx = mdata[1];
-      my = mdata[2];
+		mright = mdata[0] & 0x2;
+    	mmiddle = mdata[0] & 0x4;
+		mx = mdata[1];
+		my = mdata[2];
 	}
    
 	char *result = (char*)malloc(14);
@@ -101,10 +102,10 @@ main(int argc, char*argv[])
    mfd = open(pDevice, O_RDWR);
 
 	if(mfd == -1)
-   {
-       printf("ERROR Opening %s\n", pDevice);
-       return -1;
-   }
+	{
+		printf("ERROR Opening %s\n", pDevice);
+		return -1;
+	}
 
 	while (1)
 	{

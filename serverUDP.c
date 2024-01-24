@@ -86,19 +86,19 @@ main(int argc, char *argv[])
 
 	/* enabled input events */
 	ioctl(mfd, UI_SET_EVBIT, EV_KEY);
-   ioctl(mfd, UI_SET_KEYBIT, BTN_LEFT);
-   ioctl(mfd, UI_SET_EVBIT, EV_REL);
-   ioctl(mfd, UI_SET_RELBIT, REL_X);
-   ioctl(mfd, UI_SET_RELBIT, REL_Y); 
+	ioctl(mfd, UI_SET_KEYBIT, BTN_LEFT);
+   	ioctl(mfd, UI_SET_EVBIT, EV_REL);
+   	ioctl(mfd, UI_SET_RELBIT, REL_X);
+   	ioctl(mfd, UI_SET_RELBIT, REL_Y); 
 
-   memset(&usetup, 0, sizeof(usetup));
-   usetup.id.bustype = BUS_USB;
-   usetup.id.vendor = 0x2007;
-   usetup.id.product = 0x2011;
-   strcpy(usetup.name, "wayt sync device");
-   ioctl(mfd, UI_DEV_SETUP, &usetup);
-   ioctl(mfd, UI_DEV_CREATE);
-	
+	memset(&usetup, 0, sizeof(usetup));
+   	usetup.id.bustype = BUS_USB;
+   	usetup.id.vendor = 0x2007;
+   	usetup.id.product = 0x2011;
+   	strcpy(usetup.name, "wayt sync device");
+   	ioctl(mfd, UI_DEV_SETUP, &usetup);
+   	ioctl(mfd, UI_DEV_CREATE);
+
 	while (1)
 	{
 		// listen for clients
@@ -110,17 +110,15 @@ main(int argc, char *argv[])
 		sscanf(buffer, "%d,%d,%d,%d,%d", &MX,&MY,&MLEFT,&MMIDDLE,&MRIGHT);
 
 		// emit all input events
-      emit(mfd, EV_REL, REL_X, MX);
-      emit(mfd, EV_REL, REL_Y, -MY);
-      emit(mfd, EV_SYN, SYN_REPORT, 0);
+      	emit(mfd, EV_REL, REL_X, MX);
+      	emit(mfd, EV_REL, REL_Y, -MY);
+      	emit(mfd, EV_SYN, SYN_REPORT, 0);
 
 		// fill buffer with zeros 
 		bzero(buffer,bufferSize);
 	}
-
 	// close all open file descriptors
 	close(sockfd);
 	close(mfd);
-
 	return 0;
 }

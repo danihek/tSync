@@ -34,12 +34,13 @@ main(int argc, char *argv[])
         return 1;
 	}
 	// set all required variables to create connection
-	int 
-	bufferSize = 14;
-	int
-	port = (argv[1] != NULL) ? atoi(argv[1]) : 6968;
- 	int // create socket with UDP communication
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	int bufferSize = 14;
+	
+	// if port is not provided set it do default
+	int port = (argv[1] != NULL) ? atoi(argv[1]) : 6968;
+ 	// create socket with UDP communication
+	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	
 	int // all mouse input variables
 	MX=0,
 	MY=MX,
@@ -47,16 +48,17 @@ main(int argc, char *argv[])
 	MMIDDLE=MLEFT,
 	MRIGHT=MRIGHT;
 
-	char // create buffer
-	buffer[bufferSize];
+	// create buffer
+	char buffer[bufferSize];
 
 	struct sockaddr_in 
-	server_addr, client_addr;
+		server_addr, client_addr;
+	
 	struct uinput_setup
-	usetup;
+		usetup;
 
 	socklen_t
-	addr_size;
+		addr_size;
 
 	if (sockfd == -1)
 	{
@@ -79,44 +81,48 @@ main(int argc, char *argv[])
 	{
 		perror("bind() error");
 		exit(EXIT_FAILURE);
-	}addr_size = sizeof(client_addr);
+	}
+	addr_size = sizeof(client_addr);
 	
-   int // mouse input file descriptor
+   	int // mouse input file descriptor
 	mfd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
 
 	/* enabled input events */
 	ioctl(mfd, UI_SET_EVBIT, EV_KEY);
 	ioctl(mfd, UI_SET_KEYBIT, BTN_LEFT);
-   	ioctl(mfd, UI_SET_EVBIT, EV_REL);
-   	ioctl(mfd, UI_SET_RELBIT, REL_X);
-   	ioctl(mfd, UI_SET_RELBIT, REL_Y); 
+  	ioctl(mfd, UI_SET_EVBIT, EV_REL);
+  	ioctl(mfd, UI_SET_RELBIT, REL_X);
+  	ioctl(mfd, UI_SET_RELBIT, REL_Y); 
 
 	memset(&usetup, 0, sizeof(usetup));
-   	usetup.id.bustype = BUS_USB;
-   	usetup.id.vendor = 0x2007;
-   	usetup.id.product = 0x2011;
-   	strcpy(usetup.name, "wayt sync device");
-   	ioctl(mfd, UI_DEV_SETUP, &usetup);
-   	ioctl(mfd, UI_DEV_CREATE);
+  	usetup.id.bustype = BUS_USB;
+  	usetup.id.vendor = 0x2007;
+  	usetup.id.product = 0x2011;
+  	strcpy(usetup.name, "wayt sync device");
+  	ioctl(mfd, UI_DEV_SETUP, &usetup);
+  	ioctl(mfd, UI_DEV_CREATE);
 
 	while (1)
 	{
 		// listen for clients
 		recvfrom(sockfd,buffer,bufferSize,0,(struct sockaddr*)&client_addr, &addr_size);
 		
-		//printf("Data: %s\n",buffer); // ENABLE FOR LOG
+		// printf("Data: %s\n",buffer); // ENABLE FOR LOG
 		
 		// pasting buffer content into variables
 		sscanf(buffer, "%d,%d,%d,%d,%d", &MX,&MY,&MLEFT,&MMIDDLE,&MRIGHT);
 
 		// emit all input events
-      	emit(mfd, EV_REL, REL_X, MX);
-      	emit(mfd, EV_REL, REL_Y, -MY);
-      	emit(mfd, EV_SYN, SYN_REPORT, 0);
-
+   		emit(mfd, EV_REL, REL_X, MX);
+   		emit(mfd, EV_REL, REL_Y, -MY);
+   		emit(mfd, EV_SYN, SYN_REPORT, 0);
+		emit(mfd, EV_KEY, BTN_LEFT, MLEFT);
+		emit(mfd, EV_KEY, BTN_RIGHT, MRIGHT);
+	
 		// fill buffer with zeros 
 		bzero(buffer,bufferSize);
 	}
+	
 	// close all open file descriptors
 	close(sockfd);
 	close(mfd);

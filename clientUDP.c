@@ -17,8 +17,7 @@ stringify(
 	signed char mx,
 	signed char my,
 	unsigned char *mdata
-)
-{
+){
 	if(mbytes > 0)
 	{			
 		mleft = mdata[0] & 0x1;
@@ -27,7 +26,6 @@ stringify(
 		mx = mdata[1];
 		my = mdata[2];
 	}
-   
 	char *result = (char*)malloc(14);
 	sprintf(result, "%d,%d,%d,%d,%d", mx, my, mleft, mmiddle, mright);
 	return result;
@@ -43,38 +41,32 @@ main(int argc, char*argv[])
 		return 1;
 	}
 	// set all required variables to create connection
-	int
-	port = (argv[2] != NULL) ? atoi(argv[2]) : 6968;
-	int
-	bufferSize = 14;
-	int // create socket with UDP comunication
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	int // mouse file descriptor
-	mfd;
-	int // readed bytes from mdf
-	mbytes;
-	int // mouseleft, mousemiddle, mouseright
-	mleft,
-	mmiddle,
-	mright;
-	
-	char *
-	buffer;
-	char
-	*ip = argv[1];
+	int port = (argv[2] != NULL) ? atoi(argv[2]) : 6968;
+	// buffer size is 14 (3*int, 2*signed char)
+	int	bufferSize = 14;
+	// create socket with UDP comunication
+	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	// mouse file descriptor
+	int	mfd;
+	// readed bytes from mdf
+	int mbytes;
+	// mouseleft, mousemiddle, mouseright
+	int mleft, mmiddle, mright;
 
-	signed char
-	mx,
-	my;
-	
-	unsigned char // mouse readed values
-	mdata[3];
-	
-	struct sockaddr_in
-	addr;
+	// buffer 14 bytes - mx(1), my(1), mleft(4), mmiddle(4), mright(4)
+	char *buffer;
+	// set ip of server 
+	char *ip = argv[1];
 
-	socklen_t
-	addr_size;
+	// mouse position per update
+	signed char mx, my;
+	
+	// mouse readed values
+	unsigned char mdata[3];
+	
+	struct sockaddr_in addr;
+
+	socklen_t addr_size;
 	
 	// print error when cant create socket
 	if (sockfd == -1)
@@ -96,16 +88,15 @@ main(int argc, char*argv[])
 	// store size of server address as variable
 	addr_size = sizeof(addr);
 
-   const char
-	*pDevice = "/dev/input/mice";
-   mfd = open(pDevice, O_RDWR);
+    const char *pDevice = "/dev/input/mice";
+    mfd = open(pDevice, O_RDWR);
 
 	if(mfd == -1)
 	{
 		printf("ERROR Opening %s\n", pDevice);
 		return -1;
 	}
-
+	
 	while (1)
 	{
 		// read data from mfd
@@ -115,13 +106,12 @@ main(int argc, char*argv[])
 
 		// send info in bytes 
 		sendto(sockfd,buffer,bufferSize,0,(struct sockaddr*)&addr,addr_size);	
-		printf("size: %s\n",buffer);
+		printf("info: %s\n",buffer);
 
 		// free memory
 		free(buffer);
-
-		// fill buffer with zeros
-		//bzero(buffer, bufferSize);	
 	}
+	close(sockfd);
+	close(mfd);
 	return 0;
 }

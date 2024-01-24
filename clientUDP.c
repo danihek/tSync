@@ -45,7 +45,6 @@ main(int argc, char*argv[])
 	// set all required variables to create connection
 	int
 	port = (argv[2] != NULL) ? atoi(argv[2]) : 6968;
-	printf("%d",port);
 	int
 	bufferSize = 14;
 	int // create socket with UDP comunication
